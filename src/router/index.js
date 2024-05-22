@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from "@/store";
+import { checkIfTheresUserLogin } from '@/services/newService';
 import userLogin from '../views/userLogin.vue'
 import userRegistration from '../views/userRegistration.vue'
 import changeForgotPass from '../views/changeForgotPass.vue';
@@ -30,38 +31,46 @@ const routes = [
     path: '/changeForgotPass/:token',
     name: 'changeForgotPass',
     component: changeForgotPass,
-    props:true,
-    params:true
+    props: true,
+    params: true
   },
   {
     path: '/verifyAccount/:token',
     name: 'verifyAccount',
     component: verifyAccount,
-    props:true,
-    params:true
+    props: true,
+    params: true
   },
   {
     path: '/verificationAccount/:token',
     name: 'verificationAccount',
     component: verificationAccount,
-    props:true,
-    params:true
+    props: true,
+    params: true
   },
   {
-    path:'/user/',
-    name:'userNav',
-    component:userNav,
-    meta:{requiresAuth:true},
-    children:[
+    path: '/user/',
+    name: 'userNav',
+    component: userNav,
+    meta: { requiresAuth: true },
+    beforeEnter: async (to, from, next) => {
+      const data = await checkIfTheresUserLogin();
+      if (data == true) {
+        next("/");
+      } else {
+        next();
+      }
+    },
+    children: [
       {
-        path:'userDashboard',
-        name:'userDashboard',
-        component:userDashboard,
+        path: 'userDashboard',
+        name: 'userDashboard',
+        component: userDashboard,
       },
       {
-        path:'profile',
-        name:'userProfile',
-        component:userProfile,
+        path: 'profile',
+        name: 'userProfile',
+        component: userProfile,
       }
     ]
   }

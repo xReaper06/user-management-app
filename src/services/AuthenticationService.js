@@ -1,32 +1,40 @@
 import Api from './Api'
 
-export default{
-    insertTask(credentials){
-        return Api().post('/insertTask',credentials);
+export default {
+    logout(credentials) {
+        return Api().post('/logout', credentials);
     },
-    getTask(credentials){
-        return Api().post('/getTask',credentials);
+    login(credentials) {
+        return Api().post('/login', credentials);
     },
-    doneTask(credentials){
-        return Api().post('/doneTask',credentials);
+    register(credentials) {
+        return Api().post('/register', credentials);
     },
-    removeTask(credentials){
-        return Api().post('/removeTask',credentials);
+    insertTask(credentials) {
+        return Api().post('/insertNewTask', credentials);
     },
-    getProfile(){
+    getTask(credentials) {
+        return Api().post('/getTask', credentials);
+    },
+    doneTask(credentials) {
+        return Api().post('/doneTask', credentials);
+    },
+    removeTask(credentials) {
+        return Api().post('/removeTask', credentials);
+    },
+    getProfile() {
         return Api().get('/getProfile');
     },
-    getInfo(){
+    getInfo() {
         return Api().get('/getInfo');
     },
-    updateInfo(credentials){
-        return Api().post('/updateInfo',credentials);
+    updateInfo(credentials) {
+        return Api().post('/updateUserInfo', credentials);
     },
-    updateProfile(credentials){
-        return Api().post('/updateProfile',credentials);
+    updateProfile(credentials) {
+        return Api().post('/changeProfile', credentials);
     },
-    changePassword(credentials){
-        return Api().post('/changePass',credentials)
+    changePassword(credentials) {
+        return Api().post('/changePass', credentials)
     }
-
 }

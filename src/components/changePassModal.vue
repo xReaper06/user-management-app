@@ -1,69 +1,108 @@
 <template>
-    <div>
-        <div class="modal" v-if="props.showChangePassModal">
-          <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Change Password</h1>
-        <span class="close" @click="closeChangePassModal"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg></span>
+  <div>
+    <div class="modal" v-if="props.showChangePassModal">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">
+              Change Password
+            </h1>
+            <span class="close" @click="closeChangePassModal"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-x"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M18 6l-12 12" />
+                <path d="M6 6l12 12" /></svg
+            ></span>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="form-group">
+                <label for="newPassword" class="form-label">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  class="form-control"
+                  v-model="newPassword"
+                  required
+                  @keyup="handleStrongVerification"
+                />
+                <div v-if="showPassmsg">
+                  <p class="invalid-password">
+                    {{ passmsg }}
+                  </p>
+                </div>
+                <label for="confirmPassword" class="form-label"
+                  >Confirm New Password</label
+                >
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  class="form-control"
+                  v-model="confirmPassword"
+                  required
+                  @keyup="checkifThesame"
+                />
+              </div>
+              <div v-if="showCheckPass">
+                <p :class="texterror">
+                  {{ checkmsg }}
+                </p>
+              </div>
+              <div v-if="showSubmitButton">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  @click="submitChangePassword"
+                  @touchstart="submitChangePassword"
+                  @touchend="submitChangePassword"
+                >
+                  <span>Change Password</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <div class="container">
-      <div class="form-group">
-        <label for="newPassword" class="form-label">New Password</label>
-        <input type="password" id="newPassword" class="form-control" v-model="newPassword" required @keyup="handleStrongVerification">
-      <div v-if="showPassmsg">
-        <p class="invalid-password">
-          {{ passmsg }}
-        </p>
-    </div>
-        <label for="confirmPassword" class="form-label">Confirm New Password</label>
-        <input type="password" id="confirmPassword" class="form-control" v-model="confirmPassword" required @keyup="checkifThesame">
-      </div>
-      <div v-if="showCheckPass">
-        <p :class="texterror">
-          {{ checkmsg }}
-        </p>
-    </div>
-    <div v-if="showSubmitButton">
-        <button type="button" class="btn btn-primary" @click="submitChangePassword" @touchstart="submitChangePassword" @touchend="submitChangePassword">
-          <span v-if="!loading">Change Password</span>
-        <span>loading....</span></button>
     </div>
   </div>
-      </div>
-    </div>
-</div>
-  </div>
-    </div>
 </template>
 
 <script setup>
-import {  ref,defineProps, defineEmits,computed } from "vue";
-import AuthenticationService from '@/services/AuthenticationService';
-  
-  const props = defineProps({
-    showChangePassModal: Boolean,       // Whether to show the modal
-  });
-  
-  const emits = defineEmits(["closeChangePassModal"]);
-  
-  const closeChangePassModal = () => {
-    emits("closeChangePassModal");
-  };
-  const loading = ref(false)
-  const confirmPassword = ref('')
-  const newPassword = ref('')
-  const showPassmsg = ref(false);
-  const passmsg = ref(null)
-  const checkmsg = ref(null)
-  const showCheckPass = ref(false)
-  const showSubmitButton = ref(false);
-    const sucss = ref('')
-    const err = ref('')
+import { ref, defineProps, defineEmits, computed } from "vue";
+import AuthenticationService from "@/services/AuthenticationService";
+import { successRes, errorRes } from "@/services/newService";
 
-const handleStrongVerification = ()=>{
-    const minLength = 8;
+const props = defineProps({
+  showChangePassModal: Boolean, // Whether to show the modal
+});
+
+const emits = defineEmits(["closeChangePassModal"]);
+
+const closeChangePassModal = () => {
+  emits("closeChangePassModal");
+};
+const loading = ref(false);
+const confirmPassword = ref("");
+const newPassword = ref("");
+const showPassmsg = ref(false);
+const passmsg = ref(null);
+const checkmsg = ref(null);
+const showCheckPass = ref(false);
+const showSubmitButton = ref(false);
+
+const handleStrongVerification = () => {
+  const minLength = 8;
   const hasUppercase = /[A-Z]/.test(newPassword.value);
   const hasLowercase = /[a-z]/.test(newPassword.value);
   const hasNumber = /\d/.test(newPassword.value);
@@ -74,61 +113,66 @@ const handleStrongVerification = ()=>{
     hasUppercase &&
     hasLowercase &&
     hasNumber
-  ){
+  ) {
     showPassmsg.value = false;
-  } else if(newPassword.value == ''){
+  } else if (newPassword.value == "") {
     showPassmsg.value = false;
   } else {
     showPassmsg.value = true;
     passmsg.value = "newPassword is Weak";
   }
-}
-const checkifThesame = ()=>{
-    if(newPassword.value === confirmPassword.value && confirmPassword.value != ''){
-        showCheckPass.value = true
-        showSubmitButton.value = true
-        checkmsg.value = 'Password is valid'
-    }else if(confirmPassword.value == ''){
-        showCheckPass.value = false
-    }else{
-      showSubmitButton.value = false
-        showCheckPass.value = true
-        checkmsg.value = 'Password is not The Same'
-    }
-}
-const texterror = computed(()=>{
-  return{
-    'valid-password': newPassword.value === confirmPassword.value && confirmPassword.value != '',
-    'invalid-password': confirmPassword.value != '' && newPassword.value != confirmPassword.value
+};
+const checkifThesame = () => {
+  if (
+    newPassword.value === confirmPassword.value &&
+    confirmPassword.value != ""
+  ) {
+    showCheckPass.value = true;
+    showSubmitButton.value = true;
+    checkmsg.value = "Password is valid";
+  } else if (confirmPassword.value == "") {
+    showCheckPass.value = false;
+  } else {
+    showSubmitButton.value = false;
+    showCheckPass.value = true;
+    checkmsg.value = "Password is not The Same";
   }
-})
+};
+const texterror = computed(() => {
+  return {
+    "valid-password":
+      newPassword.value === confirmPassword.value &&
+      confirmPassword.value != "",
+    "invalid-password":
+      confirmPassword.value != "" && newPassword.value != confirmPassword.value,
+  };
+});
 
-
-const submitChangePassword = async ()=>{
-    try {
-      const response = await AuthenticationService.changePassword({
-        password:newPassword.value
-      })
-      loading.value = true
-        if(response){
-          setTimeout(()=>{
-            newPassword.value=''
-            confirmPassword.value = ''
-            showCheckPass.value = false
-            showPassmsg.value = false
-            sucss.value = response.data.msg
-            loading.value = false
-          },2000)
-          setTimeout(()=>{
-            closeChangePassModal();
-          },2000)
-        }
-    } catch (error) {
-        console.log(error)
-        err.value = error.response.data.msg
+const submitChangePassword = async () => {
+  try {
+    const response = await AuthenticationService.changePassword({
+      password: newPassword.value,
+      cpassword: confirmPassword.value,
+    });
+    loading.value = true;
+    if (response) {
+      setTimeout(() => {
+        newPassword.value = "";
+        confirmPassword.value = "";
+        showCheckPass.value = false;
+        showPassmsg.value = false;
+        successRes(response.data.message);
+        loading.value = false;
+      }, 1000);
+      setTimeout(() => {
+        closeChangePassModal();
+      }, 1000);
     }
-}
-
+  } catch (error) {
+    console.log(error);
+    errorRes(error.response.data.message);
+  }
+};
 </script>
 
 <style scoped>
@@ -163,10 +207,10 @@ const submitChangePassword = async ()=>{
 .close {
   cursor: pointer;
 }
-.invalid-password{
+.invalid-password {
   color: red;
 }
-.valid-password{
+.valid-password {
   color: rgb(10, 206, 10);
 }
 </style>
